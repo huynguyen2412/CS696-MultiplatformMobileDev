@@ -1,11 +1,23 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:insta_post/src/resources/register_form.dart';
+import 'package:insta_post/src/resources/preview_post_list.dart';
+import 'package:insta_post/src/ui/landing_page.dart';
+import 'package:provider/provider.dart';
+import 'package:insta_post/src/models/user_state_model.dart';
+import 'package:insta_post/src/resources/post_form.dart';
+import 'package:insta_post/src/ui/user_login_registration.dart';
+import 'package:insta_post/src/ui/my_instapost.dart';
+import 'package:insta_post/src/resources/friend_post.dart';
 
 void main() {
   HttpOverrides.global = new MyHttpOverrides();
-  runApp(MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => UserStateModel(),
+      child: MyApp(),
+    )
+  );
 }
 
 class MyHttpOverrides extends HttpOverrides{
@@ -21,7 +33,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Insta_post',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         // This makes the visual density adapt to the platform that you run
@@ -29,13 +41,8 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      // home: MyHomePage(title: 'InstaPost'),
-      home: Scaffold(
-          appBar: AppBar(
-            title: Text("Insta_post"),
-          ),
-          body: RegisterForm(),
-        ),
+      home: LandingPage(),
+      // home: PreviewPostList(title: "Foo_bar"),
     );
   }
 }

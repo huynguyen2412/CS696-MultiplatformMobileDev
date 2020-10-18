@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 void main() async{
-  _httpRequest();
+  hashTag();
 }
 
 void _httpRequest() async{
@@ -59,24 +59,39 @@ void _httpRequest() async{
   //   print("${res['result']} create a member. ${res['errors']}");
   // }
 
-  final String _url = 'bismarck.sdsu.edu';
-  final Map<String, String> queryParams = {
-    'nickname' : "fooBarCALA"
-  };
+  // final String _url = 'bismarck.sdsu.edu';
+  // final Map<String, String> queryParams = {
+  //   'nickname' : "fooBarCALA"
+  // };
+  //
+  // final _uri = Uri.https(_url, "/api/instapost-query/nickname-exists", queryParams);
+  // //async validation
+  // final response = await http.get(_uri,
+  //     headers: {
+  //       HttpHeaders.contentTypeHeader: 'application/json'
+  //     }
+  // );
+  // if(response.statusCode == 200){
+  //   Map<String,dynamic> _resBody = jsonDecode(response.body);
+  //   print(_resBody['result'] ?  "Nickname already taken." : null);
+  // }
+  // else
+  //   throw Exception("Failed to validate Nickname from server");
+}
 
-  final _uri = Uri.https(_url, "/api/instapost-query/nickname-exists", queryParams);
-  //async validation
-  final response = await http.get(_uri,
-      headers: {
-        HttpHeaders.contentTypeHeader: 'application/json'
-      }
+void hashTag(){
+  String tagText = "wwew #Hello#ilove#flutter #so #much";
+  List<String> hashtags = tagText.split(RegExp(r"#"));
+
+  List<String> tags = hashtags.getRange(1, hashtags.length).fold([], (prev, e){
+          var tag = e.split(" ").first;
+          return List.from(prev)..add("#$tag");
+        }
   );
-  if(response.statusCode == 200){
-    Map<String,dynamic> _resBody = jsonDecode(response.body);
-    print(_resBody['result'] ?  "Nickname already taken." : null);
-  }
-  else
-    throw Exception("Failed to validate Nickname from server");
 
+  // RegExp regEx = new RegExp(r"^[\w\s$&+,:;=?@|'<>.^*()%!-]*");
+  // String foo = "qiofhqihfdiqhi dhqdihwqidhqiwhdioqhwdoiqh 312313i!!dhqpiwdhiqwhdiqhdi #hello #world";
+  // final splitText = regEx.allMatches(foo).first.group(0);
+  print(tags);
 }
 

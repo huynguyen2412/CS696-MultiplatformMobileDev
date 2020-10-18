@@ -3,8 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:insta_post/src/models/input_field.dart';
 import 'package:http/http.dart' as http;
-import 'package:insta_post/src/models/loading_modal.dart';
 import 'package:insta_post/src/models/user_info.dart';
+import 'package:insta_post/src/models/user_state_model.dart';
+import 'package:provider/provider.dart';
 
 class RegisterForm extends StatefulWidget {
   RegisterForm({Key infoKey, this.title}) : super(key: infoKey);
@@ -25,6 +26,8 @@ class _RegisterForm extends State<RegisterForm> {
   String _emailCheckState = "";
   String _nicknameCheckState = "";
   final _urlAuthority = 'bismarck.sdsu.edu';
+  String _formError = "";
+  bool _isFormErrorExist = false;
 
   @override
   void initState() {
@@ -105,6 +108,7 @@ class _RegisterForm extends State<RegisterForm> {
       throw Exception("Failed to validate Nickname from server");
   }
 
+  //request to create an user
   Future<String> _sendRequestToCreateUser(UserInfoPODO userInfoPODO) async{
     final _path = "/api/instapost-upload/newuser";
     final _uri = Uri.https(_urlAuthority, _path);
@@ -121,13 +125,15 @@ class _RegisterForm extends State<RegisterForm> {
       })
     );
 
-    if(response.statusCode == 200){
-      return "Member has created.";
+    final res = jsonDecode(response.body);
+    if(response.statusCode != 200){
+      throw ("${res['result']} to create a member. ${res['errors']}");
     }
-    else{
-      final res = jsonDecode(response.body);
-      return ("${res['result']} create a member. ${res['errors']}");
-    }
+
+    //return error if email include either first name or last name or both
+    if(res['result'] == 'fail')
+      return res['errors'];
+    return res['result'];
   }
 
   //Display form information
@@ -138,6 +144,21 @@ class _RegisterForm extends State<RegisterForm> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
+            Text(
+              "You haven't had an account yet?",
+              style: TextStyle(
+                color: Colors.black
+              ),
+            ),
+            Visibility(
+              child: Text(
+                _formError,
+                style: TextStyle(
+                    color: Colors.red
+                ),
+              ),  //Display Text Error as username or password incorrect
+              visible: _isFormErrorExist
+            ),
             InputField(
               labelTextField: 'FirstName',
               obscureText: false,
@@ -193,11 +214,27 @@ class _RegisterForm extends State<RegisterForm> {
                       )
                     );
 
-                    print("$response");
+                    //navigate to User's HomePage if successful
+                    if(response == 'success'){
+                      //update the state and user info for UserStateModel
+                      Provider.of<UserStateModel>(context, listen: false)
+                        ..setUserInfo(UserInfoPODO(
+                          firstName: fNameController.text,
+                          lastName: lNameController.text,
+                          nickname: nicknameController.text,
+                          email: emailController.text,
+                          password: passwordController.text))
+                        ..toggleLoginState(); //enable SignIn mode
+                    }else{
+                      setState(() {
+                        _formError = response;
+                        _isFormErrorExist = !_isFormErrorExist;
+                      });
+                    }
                   }
                 },
                 child:
-                    const Text('Register', style: TextStyle(fontSize: 20)),
+                    const Text('Register', style: TextStyle(fontSize: 15)),
                 color: Theme.of(context).primaryColor,
               ),
             ),
@@ -208,13 +245,24 @@ class _RegisterForm extends State<RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
+    return Column(
         children: <Widget>[
-          listInfoTextField(_formKey)
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.black12,
+                width: 2.0,
+              ),
+              borderRadius: BorderRadius.all(
+                Radius.circular(6.0)
+              ),
+            ),
+            child: Center(
+              child: listInfoTextField(_formKey),
+            ),
+          )
         ],
-      ),
-    );
+      );
   }
 }
 

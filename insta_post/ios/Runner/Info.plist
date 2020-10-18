@@ -41,5 +41,9 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSCameraUsageDescription</key>
+    <string>Allow taking pictures for Instapost</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Allow uploading to Instapost</string>
 </dict>
 </plist>
