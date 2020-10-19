@@ -1,14 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:insta_post/src/resources/preview_post_list.dart';
 import 'package:insta_post/src/ui/landing_page.dart';
 import 'package:provider/provider.dart';
 import 'package:insta_post/src/models/user_state_model.dart';
-import 'package:insta_post/src/resources/post_form.dart';
-import 'package:insta_post/src/ui/user_login_registration.dart';
-import 'package:insta_post/src/ui/my_instapost.dart';
-import 'package:insta_post/src/resources/friend_post.dart';
 
 void main() {
   HttpOverrides.global = new MyHttpOverrides();

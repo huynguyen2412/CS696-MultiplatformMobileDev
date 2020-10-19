@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:insta_post/src/models/user_state_model.dart';
-import 'package:insta_post/src/resources/register_form.dart';
 import 'package:insta_post/src/ui/my_instapost.dart';
 import 'package:insta_post/src/ui/user_login_registration.dart';
 import 'package:provider/provider.dart';
@@ -16,13 +15,6 @@ class LandingPage extends StatefulWidget {
 }
 
 class _LandingPageState extends State<LandingPage> {
-
-  _navigateToRegisterPage(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => RegisterForm(title : "Sign-in"))
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

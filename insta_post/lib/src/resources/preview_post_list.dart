@@ -15,6 +15,7 @@ class PreviewPostList extends StatefulWidget{
   final String urlAuthority;
   final String postIdsPath; //path to get all ids of a hashtag or a nickname
   final String listNameKey; //key name map to a list of item from json body
+                            //api/instapost-query/nicknames or instapost-query/hashtags
   final String paramValue; //value is used to query response
   final String paramKey; //the key name parameter is used to query all ids of a nickname
                         //nickname-post-ids?paramKey= or hashtags-post-ids?paramKey=
@@ -41,9 +42,6 @@ class _PreviewPostList extends State<PreviewPostList>{
 
   //get a list of post-ids and create a list of userPosts' info
   void _loadUserPostList(String paramValue) async{
-    // final String urlAuthority = "bismarck.sdsu.edu";
-    // final String postIdsPath = "/api/instapost-query/nickname-post-ids";
-
     final Map<String, String> queryParams = {
       widget.paramKey : paramValue
     };
@@ -111,10 +109,10 @@ class _PreviewPostList extends State<PreviewPostList>{
             context,
             MaterialPageRoute(
               builder: (context) =>
-                  FriendPost(
-                    userPostInfo: userPost,
-                    nickname: widget.title,
-                  )
+                FriendPost(
+                  userPostInfo: userPost,
+                  nickname: widget.title,
+                )
             )
           )
         },
@@ -130,11 +128,35 @@ class _PreviewPostList extends State<PreviewPostList>{
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: new StreamBuilder<List<UserPostPODO>>(
+    // return Scaffold(
+    //   appBar: AppBar(
+    //     title: Text(widget.title),
+    //   ),
+    //   body: new StreamBuilder<List<UserPostPODO>>(
+    //       stream: _userPostsStream,
+    //       initialData: _userPosts,
+    //       builder: (context, AsyncSnapshot<List<UserPostPODO>> snapshot){
+    //         if(snapshot.hasError){
+    //           return Center(
+    //             child: Icon(
+    //               Icons.error_outline,
+    //               color: Colors.red,
+    //               size: 60,
+    //             ),
+    //           );
+    //         }
+    //         else if(snapshot.data != null){
+    //           return previewListDisplayer(snapshot.data);
+    //         }else{
+    //           return Center(
+    //             child: CircularProgressIndicator(),
+    //           );
+    //         }
+    //       }
+    //   ),
+    // );
+    return Container(
+      child: new StreamBuilder<List<UserPostPODO>>(
           stream: _userPostsStream,
           initialData: _userPosts,
           builder: (context, AsyncSnapshot<List<UserPostPODO>> snapshot){

@@ -18,8 +18,8 @@ class PostForm extends StatefulWidget{
 class _PostForm extends State<PostForm>{
   String _email, _password;
   GlobalKey _postFormKey = GlobalKey<FormState>();
-  String _formError = "";
-  bool _isFormErrorExist = false;
+  // String _formError = "";
+  // bool _isFormErrorExist = false;
   final _tweetController = TextEditingController();
   final imgPicker = ImagePicker();
   File _postImage;
@@ -155,14 +155,21 @@ class _PostForm extends State<PostForm>{
   }
 
   //handle the submission of a post with/without image
-  Future<bool> _submitHelper() async{
+  Future<bool> _submitHelper(BuildContext context) async{
     final res = await _submitTextPost(_tweetController.text);
     final textResBody = jsonDecode(res);
     final postId = textResBody['id'];
+    SnackBar snackBar;
+
     //text post only
     if(postId == -1){
-      _isFormErrorExist = !_isFormErrorExist;
-      _formError = textResBody['errors'];
+      // _isFormErrorExist = !_isFormErrorExist;
+      // _formError = textResBody['errors'];
+      snackBar = new SnackBar(
+        content: Text(textResBody['errors']),
+        duration: new Duration(seconds: 3),
+      );
+      Scaffold.of(context).showSnackBar(snackBar);
       return false;
     }
 
@@ -171,24 +178,29 @@ class _PostForm extends State<PostForm>{
       final imageRes = await _submitImage(_postImage, postId);
       final imgResBody = jsonDecode(imageRes);
       if(imgResBody['result'] == 'fail'){
-        _isFormErrorExist = !_isFormErrorExist;
-        _formError = textResBody['errors'];
+        // _isFormErrorExist = !_isFormErrorExist;
+        // _formError = textResBody['errors'];
+        snackBar = new SnackBar(
+          content: Text(textResBody['errors']),
+          duration: new Duration(seconds: 3),
+        );
+        Scaffold.of(context).showSnackBar(snackBar);
         return false;
       }
-      return true;
+      // return true;
     }
 
     return true;
   }
 
-  Widget createPost(GlobalKey<FormState> textPostFormKey){
+  Widget createPost(GlobalKey<FormState> textPostFormKey, BuildContext context){
     return ElevatedButton.icon(
         onPressed: ()async{
           if(textPostFormKey.currentState.validate()){
-            final postStatus = await _submitHelper();
-            print("Status after creating post: ${postStatus.toString()}.");
-            if(!_isFormErrorExist && postStatus)
+            final postStatus = await _submitHelper(context);
+            if(postStatus){
               Navigator.pop(context);
+            }
           }
         },
         icon: Icon(
@@ -199,6 +211,7 @@ class _PostForm extends State<PostForm>{
     );
   }
 
+  //load an image to cache
   Future _uploadAnImage() async{
     final PickedFile pickedFile = await imgPicker.getImage(
         source: ImageSource.gallery, imageQuality: 50
@@ -247,7 +260,7 @@ class _PostForm extends State<PostForm>{
     );
   }
 
-  Widget postForm(GlobalKey<FormState> textPostFormKey){
+  Widget postForm(GlobalKey<FormState> textPostFormKey, BuildContext context){
     return Container(
       margin: const EdgeInsets.all(20),
       child: Form(
@@ -256,15 +269,6 @@ class _PostForm extends State<PostForm>{
           children: <Widget>[
             Center(
               child: _postImage == null ? Text("") : previewImage(),
-            ),//PreviewImage
-            Visibility(
-                child: Text(
-                  _formError,
-                  style: TextStyle(
-                      color: Colors.red
-                  ),
-                ),  //Display Text Error as username or password incorrect
-                visible: _isFormErrorExist
             ),
             postTextField(_tweetController), //tweetField
             Row(
@@ -279,7 +283,7 @@ class _PostForm extends State<PostForm>{
                 Expanded(
                     child: Container(
                       alignment: Alignment.centerRight,
-                      child: createPost(textPostFormKey),
+                      child: createPost(textPostFormKey, context),
                     )
                 )
               ],
@@ -294,10 +298,13 @@ class _PostForm extends State<PostForm>{
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Draft"),
+        title: Text("Create a posta!"),
       ),
-      body: SingleChildScrollView(
-        child: postForm(_postFormKey),
+      body: Builder(
+        builder: (context) =>
+          SingleChildScrollView(
+              child: postForm(_postFormKey, context),
+          ),
       )
     );
   }

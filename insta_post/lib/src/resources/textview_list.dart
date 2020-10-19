@@ -11,6 +11,7 @@ class TextViewList extends StatefulWidget{
   final String urlAuthority;
   final String path;
   final String listNameKey; //key name map to a list of item from json body
+                            //api/instapost-query/nicknames or instapost-query/hashtags
   final String postIdsPath; //path of endpoint when user taps on an item from the list
   final Icon itemListIcon;
   final String title;
@@ -58,12 +59,17 @@ class _TextViewList extends State<TextViewList>{
               await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => PreviewPostList(
-                      urlAuthority: widget.urlAuthority,
-                      postIdsPath: widget.postIdsPath,
-                      paramValue: dataList[index],
-                      title: dataList[index],
-                      paramKey: widget.paramKey,
+                    builder: (context) => Scaffold(
+                      appBar: AppBar(
+                        title: Text(widget.title),
+                      ),
+                      body: PreviewPostList(
+                        urlAuthority: widget.urlAuthority,
+                        postIdsPath: widget.postIdsPath,
+                        paramValue: dataList[index],
+                        title: dataList[index],
+                        paramKey: widget.paramKey,
+                      ),
                     )
                 )
               );

@@ -5,6 +5,7 @@ class NicknameListViewer extends StatelessWidget{
   final String urlAuthority = "bismarck.sdsu.edu";
   final String path = "/api/instapost-query/nicknames";
   final String listNameKey = "nicknames"; //key name map to a list of item from json body
+                                          //api/instapost-query/nicknames or instapost-query/hashtags
   final String postIdsPath = "/api/instapost-query/nickname-post-ids";
   final Icon icon = Icon(Icons.person_pin);
   final String title = "Nicknames";

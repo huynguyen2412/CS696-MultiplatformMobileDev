@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:insta_post/src/resources/post_form.dart';
+import 'package:insta_post/src/resources/preview_post_list.dart';
 import 'package:insta_post/src/ui/hashtag_list.dart';
 import 'package:insta_post/src/ui/nickname_list.dart';
 
 class MyInstapost extends StatelessWidget{
+
+  final String title = "foo-bar";
+  final String urlAuthority = "bismarck.sdsu.edu";
+  final String postIdsPath = "/api/instapost-query/nickname-post-ids"; //path to get all ids of a hashtag or a nickname
+  final String listNameKey = "nicknames"; //key name map to a list of item from json body
+                                        //api/instapost-query/nicknames or instapost-query/hashtags
+  final String paramValue = "foo_bar"; //value is used to query response//user-nickname
+  final String paramKey = "nickname";
 
   _createAPost(BuildContext context) async{
     return Navigator.push(
@@ -66,17 +75,20 @@ class MyInstapost extends StatelessWidget{
                 color: Theme.of(context).primaryColor
               ),
             ),
-            nicknamePage(context),//nicknames
-            hashtagPage(context)//hashtag
+            nicknamePage(context),//nicknames drawer
+            hashtagPage(context)//hashtags drawer
           ],
         ),
       ),
       body: Center(
-        child: Column(
-          children: <Widget>[
-            Text("List of Post")
-          ],
-        ),
+        child: PreviewPostList(
+          urlAuthority: urlAuthority,
+          postIdsPath: postIdsPath,
+          paramKey: paramKey,
+          listNameKey: listNameKey,
+          paramValue: paramValue,
+          title: title,
+        )
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add_circle),
