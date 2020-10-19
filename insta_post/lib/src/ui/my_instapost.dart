@@ -3,11 +3,14 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:insta_post/src/models/user_state_model.dart';
 import 'package:insta_post/src/resources/post_form.dart';
 import 'package:insta_post/src/resources/preview_post_list.dart';
 import 'package:insta_post/src/ui/hashtag_list.dart';
 import 'package:insta_post/src/ui/nickname_list.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class MyInstaPost extends StatefulWidget{
 
@@ -28,11 +31,18 @@ class _MyInstaPost extends State<MyInstaPost>{
 
   @override
   void initState(){
-    _randNickname = getRandomNickname();
+    _randNickname = getNickname();
     super.initState();
   }
 
-  Future<String> getRandomNickname() async{
+  //return a random nickname if the nickname not exist in SharedPref
+  Future<String> getNickname() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String email = Provider.of<UserStateModel>(context, listen: false).getUserInfo().email;
+    final String nickname = prefs.getString(email);
+    if(nickname != null)
+      return nickname;
+
     final String path = "/api/instapost-query/nicknames";
     final uri = Uri.https(urlAuthority, path);
     final response = await http.get(uri,

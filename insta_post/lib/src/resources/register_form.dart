@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:insta_post/src/models/user_info.dart';
 import 'package:insta_post/src/models/user_state_model.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterForm extends StatefulWidget {
   RegisterForm({Key infoKey, this.title}) : super(key: infoKey);
@@ -225,6 +226,10 @@ class _RegisterForm extends State<RegisterForm> {
                           email: emailController.text,
                           password: passwordController.text))
                         ..toggleLoginState(); //enable SignIn mode
+
+                      //Map nickname with email in cache to display user's posts in homepage
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      prefs.setString(emailController.text, nicknameController.text);
                     }else{
                       setState(() {
                         _formError = response;
