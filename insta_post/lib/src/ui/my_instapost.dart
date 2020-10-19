@@ -1,18 +1,51 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:insta_post/src/resources/post_form.dart';
 import 'package:insta_post/src/resources/preview_post_list.dart';
 import 'package:insta_post/src/ui/hashtag_list.dart';
 import 'package:insta_post/src/ui/nickname_list.dart';
+import 'package:http/http.dart' as http;
 
-class MyInstapost extends StatelessWidget{
+class MyInstaPost extends StatefulWidget{
 
-  final String title = "foo-bar";
+  @override
+  _MyInstaPost createState() => _MyInstaPost();
+}
+
+class _MyInstaPost extends State<MyInstaPost>{
+
+  final String title = "-";
   final String urlAuthority = "bismarck.sdsu.edu";
   final String postIdsPath = "/api/instapost-query/nickname-post-ids"; //path to get all ids of a hashtag or a nickname
   final String listNameKey = "nicknames"; //key name map to a list of item from json body
                                         //api/instapost-query/nicknames or instapost-query/hashtags
-  final String paramValue = "foo_bar"; //value is used to query response//user-nickname
+  final String paramValue = ""; //value is used to query response//user-nickname
   final String paramKey = "nickname";
+  Future<String> _randNickname;
+
+  @override
+  void initState(){
+    _randNickname = getRandomNickname();
+    super.initState();
+  }
+
+  Future<String> getRandomNickname() async{
+    final String path = "/api/instapost-query/nicknames";
+    final uri = Uri.https(urlAuthority, path);
+    final response = await http.get(uri,
+        headers: {
+          HttpHeaders.contentTypeHeader : "application/json"
+        }
+    );
+    final jsonResBody = jsonDecode(response.body);
+    final List<dynamic> nickNames = jsonResBody['nicknames'];
+    var rand = new Random();
+    final randNum = rand.nextInt(nickNames.length);
+    return nickNames[randNum].toString();
+  }
 
   _createAPost(BuildContext context) async{
     return Navigator.push(
@@ -80,15 +113,34 @@ class MyInstapost extends StatelessWidget{
           ],
         ),
       ),
-      body: Center(
-        child: PreviewPostList(
-          urlAuthority: urlAuthority,
-          postIdsPath: postIdsPath,
-          paramKey: paramKey,
-          listNameKey: listNameKey,
-          paramValue: paramValue,
-          title: title,
-        )
+      body: new FutureBuilder<String>(
+        future: _randNickname,
+        builder: (context, AsyncSnapshot<String> snapshot){
+          if(snapshot.hasError){
+            return Center(
+                child: Icon(
+                  Icons.error_outline,
+                  color: Colors.red,
+                  size: 60,
+                )
+            );
+          }else if(snapshot.hasData){
+            return Center(
+              child: PreviewPostList(
+                urlAuthority: urlAuthority,
+                postIdsPath: postIdsPath,
+                paramKey: paramKey,
+                listNameKey: listNameKey,
+                paramValue: snapshot.data.toString(),
+                title: snapshot.data.toString(),
+              )
+              );
+          }else{
+           return Container(
+             child: CircularProgressIndicator(),
+           );
+          }
+        }
       ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add_circle),

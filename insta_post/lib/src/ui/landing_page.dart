@@ -20,7 +20,7 @@ class _LandingPageState extends State<LandingPage> {
   Widget build(BuildContext context) {
     return Consumer<UserStateModel>(
       builder: (context, userState, child){
-        return userState.isSignIn ? MyInstapost() : LoginRegistration();
+        return userState.isSignIn ? MyInstaPost() : LoginRegistration();
       },
     );
   }
