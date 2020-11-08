@@ -13,7 +13,7 @@ const Title = (props) => {
 
 const styles = StyleSheet.create({
   header: {
-    marginTop: 40
+    marginTop: 40,
   },
   headerText: {
     textAlign: 'center',
