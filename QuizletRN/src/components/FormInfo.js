@@ -9,6 +9,8 @@ import {
 import {Formik, ErrorMessage} from 'formik';
 import * as Yup from 'yup';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 
 import Title from '../components/Title';
 import UserInfo from '../model/UserInfo';
@@ -26,7 +28,7 @@ const ValidSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email cannot empty'),
 });
 
-export const FormInfo = () => {
+export const FormInfo = ({ navigation }) => {
   const [userInfo, setUserInfo] = useState(new UserInfo());
 
   /* Only navigate to the Quiz route 
@@ -34,6 +36,11 @@ export const FormInfo = () => {
   const takeTheQuiz = (info) => {
     userInfo.updateUserInfo(info);
     setUserInfo(userInfo);
+    navigateQuizPage(navigation);
+  };
+
+  const navigateQuizPage = (navigation) => {
+    navigation.push('Quiz');
   };
 
   return (

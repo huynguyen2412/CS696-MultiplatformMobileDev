@@ -12,13 +12,9 @@ const Stack = createStackNavigator();
 const App: () => React$Node = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen
-          name="Home"
-          component={FormInfo}
-          options={{title: 'Home'}}
-        />
-        {/* Home Route*/}
+      <Stack.Navigator initialRouteName="Quiz">
+
+        {/* Quiz Route*/}
         <Stack.Screen
           name="Quiz"
           component={QuizRoute}
@@ -32,3 +28,11 @@ const App: () => React$Node = () => {
 const styles = StyleSheet.create({});
 
 export default App;
+        // {
+        //   /* Home Route*/
+        // }
+        // <Stack.Screen
+        //   name="Home"
+        //   component={FormInfo}
+        //   options={{title: 'Home'}}
+        // />;
