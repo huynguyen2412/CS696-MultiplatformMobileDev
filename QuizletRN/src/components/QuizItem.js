@@ -12,9 +12,9 @@ export const QuizItem = ({ quizData, questionIndex }) => {
 
   const answerList = quizData.answers.map((ans, index) =>{
     return (
-      <ResultContext.Consumer>        
+      <ResultContext.Consumer key={index}>        
         {(resultsContext) => (
-          <View key={index}>
+          <View>
             <View style={style.radioButton}>
               <RadioButton
                 value={ans}
@@ -22,7 +22,6 @@ export const QuizItem = ({ quizData, questionIndex }) => {
                 onPress={() => {
                   setAnswers(ans);
                   submitAnswer(resultsContext.results, ans, questionIndex);
-                  console.log(`Result Context: ${resultsContext.results[questionIndex]}`);
                 }}
               />
               <Text>{ans}</Text>
@@ -35,7 +34,7 @@ export const QuizItem = ({ quizData, questionIndex }) => {
 
   return (
     <View style={style.container}>
-      <Text style={style.question}>{quizData.question}</Text>
+      <Text style={style.question}>{questionIndex+1 + ". " + quizData.question}</Text>
       {answerList}
     </View>
   );

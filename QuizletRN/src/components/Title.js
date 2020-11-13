@@ -13,11 +13,11 @@ const Title = (props) => {
 
 const styles = StyleSheet.create({
   header: {
-    marginTop: 40,
+    marginTop: 5,
   },
   headerText: {
     textAlign: 'center',
-    fontSize: 72,
+    fontSize: 50,
     color: 'rgba(175, 47, 47, 0.25)',
     fontWeight: '100'
   }

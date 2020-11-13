@@ -1,16 +1,17 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   TextInput,
   View,
   StyleSheet,
   Button,
   Text,
+  Alert
 } from 'react-native';
 import {Formik, ErrorMessage} from 'formik';
 import * as Yup from 'yup';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import RNExitApp from 'react-native-exit-app';
 
 import Title from '../components/Title';
 import UserInfo from '../model/UserInfo';
@@ -28,14 +29,25 @@ const ValidSchema = Yup.object().shape({
   email: Yup.string().email('Invalid email').required('Email cannot empty'),
 });
 
-export const FormInfo = ({ navigation }) => {
-  const [userInfo, setUserInfo] = useState(new UserInfo());
+
+export const FormInfo = ({ navigation, route}) => {
+  const [userInfo, setUserInfo] = useState({data : ''});
+
+  useEffect(()=>{
+    const fetchData = async() => {
+      const data = await readUserInfo();
+      setUserInfo({data});
+    };
+    fetchData();
+  },[]);
 
   /* Only navigate to the Quiz route 
   when all fields are valid */
-  const takeTheQuiz = (info) => {
-    userInfo.updateUserInfo(info);
-    setUserInfo(userInfo);
+  const takeTheQuiz = async (info) => {
+    const userData = new UserInfo();
+    userData.updateUserInfo(info);
+    setUserInfo({data : userData}); 
+    await storeUserInfo(userData);
     navigateQuizPage(navigation);
   };
 
@@ -44,14 +56,27 @@ export const FormInfo = ({ navigation }) => {
   };
 
   return (
+    <View>
+      {
+        userInfo.data == '' ? 
+          <Text>Loading ....</Text> :
+          <FormContainer existUserInfo={userInfo.data} route={route} submit={takeTheQuiz}/>
+      }
+    </View>
+  );
+};
+
+const FormContainer = ({existUserInfo, route, submit}) => {
+  return (
     <Formik
       initialValues={{
-        firstName: '',
-        lastName: '',
-        nickName: '',
-        email: '',
+        firstName:
+          existUserInfo.firstName != null ? existUserInfo.firstName : '',
+        lastName: existUserInfo.lastName != null ? existUserInfo.lastName : '',
+        nickName: existUserInfo.nickName != null ? existUserInfo.nickName : '',
+        email: existUserInfo.email != null ? existUserInfo.email : '',
       }}
-      onSubmit={(values) => takeTheQuiz(values)}
+      onSubmit={async (values) => await submit(values)}
       validationSchema={ValidSchema}>
       {({handleChange, handleBlur, handleSubmit, values}) => (
         <KeyboardAwareScrollView>
@@ -87,7 +112,11 @@ export const FormInfo = ({ navigation }) => {
               validKey="email"
             />
             <OpenQuiz handleSubmit={handleSubmit} />
+            <CloseApp />
           </View>
+          {route.params?.score ? (
+            <DisplayResult score={route.params.score} />
+          ) : null}
         </KeyboardAwareScrollView>
       )}
     </Formik>
@@ -125,6 +154,67 @@ const OpenQuiz = ({handleSubmit}) => {
   );
 };
 
+{/* Form info will be saved before exiting */}
+const CloseApp = ({formData}) => {
+  return (
+    <View style={styles.submit}>
+      <Button title="Close" onPress={RNExitApp.exitApp} />
+    </View>
+  );
+};
+
+const DisplayResult = ({score}) => {
+  return (
+    <View>
+      <Text style={styles.result}>Quiz Result: {score}</Text>
+    </View>
+  );
+};
+
+{/* Store user infomation in json object*/}
+const storeUserInfo = async (userInfo) => {
+  try {
+    const userInfoJson = JSON.stringify(userInfo);
+    const isUserInfoExist = await readUserInfo();
+    if(isUserInfoExist != null)
+      await AsyncStorage.mergeItem('userInfo', userInfoJson);
+    else 
+      await AsyncStorage.setItem('userInfo', userInfoJson);
+  } catch (e) {
+    Alert.alert(
+      "Error - User Info",
+      `${e}. 
+      \nUser info can't be saved. Please try it again`
+      [
+        {
+          text: "Close",
+          onPress: () => {},
+        }
+      ]
+    );
+  }
+}
+
+const readUserInfo = async () => {
+  try {
+    const userInfo = await AsyncStorage.getItem('userInfo');
+    return userInfo != null ? JSON.parse(userInfo) : null;
+  } catch (e) {
+    Alert.alert(
+      'Error - User Info',
+      `${e}. 
+      \nCan't load the user info. 
+      \nPlease restart and try again.`
+      [
+        {
+          text: 'Close',
+          onPress: () => {},
+        }
+      ],
+    );
+  }
+}
+
 const styles = StyleSheet.create({
   inner: {
     flex: 1,
@@ -142,4 +232,9 @@ const styles = StyleSheet.create({
   invalidInput: {
     color: '#EE1818',
   },
+  result: {
+    fontSize: 20,
+    textAlign: 'center',
+    marginTop: 10
+  }
 });
