@@ -15,6 +15,7 @@ import RNExitApp from 'react-native-exit-app';
 
 import Title from '../components/Title';
 import UserInfo from '../model/UserInfo';
+import {SaveFile, DeleteFile, ReadFile} from '../utils/RNFileSystem';
 
 const ValidSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -26,17 +27,30 @@ const ValidSchema = Yup.object().shape({
   nickName: Yup.string()
     .matches(/^[a-zA-Z\t\s]*$/, 'Nick name is not valid')
     .required('Nick name cannot empty'),
-  email: Yup.string().email('Invalid email').required('Email cannot empty'),
+  age: Yup.number()
+    .min(5, 'Invalid age')
+    .max(200, 'Invalid age')
+    .required('Age cannot empty'),
 });
 
 
 export const FormInfo = ({ navigation, route}) => {
   const [userInfo, setUserInfo] = useState({data : ''});
+  const [scoreState, setScore]  = useState(-1);
+
+  useEffect(() =>{
+    const updateScore = () => {
+      setScore(route.params?.score)
+    };
+    updateScore();
+  },[route.params?.score])
 
   useEffect(()=>{
     const fetchData = async() => {
       const data = await readUserInfo();
+      const scoreState = await ReadFile("scoreInfo.txt");
       setUserInfo({data});
+      setScore(parseInt(scoreState));
     };
     fetchData();
   },[]);
@@ -62,6 +76,8 @@ export const FormInfo = ({ navigation, route}) => {
           <Text>Loading ....</Text> :
           <FormContainer existUserInfo={userInfo.data} route={route} submit={takeTheQuiz}/>
       }
+      <CloseApp score={scoreState}/>
+      {scoreState > 0 && scoreState ? (<DisplayResult score={scoreState} />) : null}
     </View>
   );
 };
@@ -70,11 +86,10 @@ const FormContainer = ({existUserInfo, route, submit}) => {
   return (
     <Formik
       initialValues={{
-        firstName:
-          existUserInfo.firstName != null ? existUserInfo.firstName : '',
+        firstName: existUserInfo.firstName != null ? existUserInfo.firstName : '',
         lastName: existUserInfo.lastName != null ? existUserInfo.lastName : '',
         nickName: existUserInfo.nickName != null ? existUserInfo.nickName : '',
-        email: existUserInfo.email != null ? existUserInfo.email : '',
+        age: existUserInfo.age != null ? existUserInfo.age : ''
       }}
       onSubmit={async (values) => await submit(values)}
       validationSchema={ValidSchema}>
@@ -88,6 +103,7 @@ const FormContainer = ({existUserInfo, route, submit}) => {
               placeholder="First Name"
               value={values.firstName}
               validKey="firstName"
+              keyboardType="default"
             />
             <FormInput
               handleChange={handleChange('lastName')}
@@ -95,6 +111,7 @@ const FormContainer = ({existUserInfo, route, submit}) => {
               placeholder="Last Name"
               value={values.lastName}
               validKey="lastName"
+              keyboardType="default"
             />
             <FormInput
               handleChange={handleChange('nickName')}
@@ -102,21 +119,18 @@ const FormContainer = ({existUserInfo, route, submit}) => {
               placeholder="Nick Name"
               value={values.nickName}
               validKey="nickName"
+              keyboardType="default"
             />
-
             <FormInput
-              handleChange={handleChange('email')}
-              handleBlur={handleBlur('email')}
-              placeholder="Email address"
-              value={values.email}
-              validKey="email"
+              handleChange={handleChange('age')}
+              handleBlur={handleBlur('age')}
+              placeholder="Age"
+              value={values.age}
+              validKey="age"
+              keyboardType="number-pad"
             />
             <OpenQuiz handleSubmit={handleSubmit} />
-            <CloseApp />
           </View>
-          {route.params?.score ? (
-            <DisplayResult score={route.params.score} />
-          ) : null}
         </KeyboardAwareScrollView>
       )}
     </Formik>
@@ -129,6 +143,7 @@ const FormInput = ({
   placeholder,
   value,
   validKey,
+  keyboardType
 }) => {
   return (
     <View>
@@ -138,6 +153,7 @@ const FormInput = ({
         value={value}
         style={styles.formInput}
         placeholder={placeholder}
+        keyboardType={keyboardType}
       />
       <Text style={styles.invalidInput}>
         <ErrorMessage name={validKey} />
@@ -155,10 +171,16 @@ const OpenQuiz = ({handleSubmit}) => {
 };
 
 {/* Form info will be saved before exiting */}
-const CloseApp = ({formData}) => {
+const CloseApp = ({score}) => {
   return (
     <View style={styles.submit}>
-      <Button title="Close" onPress={RNExitApp.exitApp} />
+      <Button title="Close" onPress={async() => {
+        if(score >= 0){
+          await DeleteFile('scoreInfo.txt');
+          await SaveFile('scoreInfo.txt', score.toString());
+        }
+        RNExitApp.exitApp();  
+      }} />
     </View>
   );
 };
@@ -166,7 +188,7 @@ const CloseApp = ({formData}) => {
 const DisplayResult = ({score}) => {
   return (
     <View>
-      <Text style={styles.result}>Quiz Result: {score}</Text>
+      <Text style={styles.result}>Quiz Result: {score} pts</Text>
     </View>
   );
 };
@@ -183,8 +205,7 @@ const storeUserInfo = async (userInfo) => {
   } catch (e) {
     Alert.alert(
       "Error - User Info",
-      `${e}. 
-      \nUser info can't be saved. Please try it again`
+      `${e}.User info can't be saved. Please try it again`
       [
         {
           text: "Close",
@@ -202,9 +223,7 @@ const readUserInfo = async () => {
   } catch (e) {
     Alert.alert(
       'Error - User Info',
-      `${e}. 
-      \nCan't load the user info. 
-      \nPlease restart and try again.`
+      `${e}.Can't load the user info. Please restart and try again.`
       [
         {
           text: 'Close',
