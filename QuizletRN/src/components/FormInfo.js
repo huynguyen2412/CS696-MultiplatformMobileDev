@@ -86,10 +86,10 @@ const FormContainer = ({existUserInfo, route, submit}) => {
   return (
     <Formik
       initialValues={{
-        firstName: existUserInfo.firstName != null ? existUserInfo.firstName : '',
-        lastName: existUserInfo.lastName != null ? existUserInfo.lastName : '',
-        nickName: existUserInfo.nickName != null ? existUserInfo.nickName : '',
-        age: existUserInfo.age != null ? existUserInfo.age : ''
+        firstName: existUserInfo != null ? existUserInfo.firstName : '',
+        lastName: existUserInfo != null ? existUserInfo.lastName : '',
+        nickName: existUserInfo != null ? existUserInfo.nickName : '',
+        age: existUserInfo != null ? existUserInfo.age : ''
       }}
       onSubmit={async (values) => await submit(values)}
       validationSchema={ValidSchema}>
