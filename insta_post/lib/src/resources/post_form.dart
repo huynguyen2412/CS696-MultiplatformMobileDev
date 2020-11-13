@@ -199,7 +199,7 @@ class _PostForm extends State<PostForm>{
           if(textPostFormKey.currentState.validate()){
             final postStatus = await _submitHelper(context);
             if(postStatus){
-              Navigator.pop(context);
+              Navigator.pop(context, postStatus);
             }
           }
         },

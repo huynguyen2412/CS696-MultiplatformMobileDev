@@ -128,33 +128,6 @@ class _PreviewPostList extends State<PreviewPostList>{
 
   @override
   Widget build(BuildContext context) {
-    // return Scaffold(
-    //   appBar: AppBar(
-    //     title: Text(widget.title),
-    //   ),
-    //   body: new StreamBuilder<List<UserPostPODO>>(
-    //       stream: _userPostsStream,
-    //       initialData: _userPosts,
-    //       builder: (context, AsyncSnapshot<List<UserPostPODO>> snapshot){
-    //         if(snapshot.hasError){
-    //           return Center(
-    //             child: Icon(
-    //               Icons.error_outline,
-    //               color: Colors.red,
-    //               size: 60,
-    //             ),
-    //           );
-    //         }
-    //         else if(snapshot.data != null){
-    //           return previewListDisplayer(snapshot.data);
-    //         }else{
-    //           return Center(
-    //             child: CircularProgressIndicator(),
-    //           );
-    //         }
-    //       }
-    //   ),
-    // );
     return Container(
       child: new StreamBuilder<List<UserPostPODO>>(
           stream: _userPostsStream,

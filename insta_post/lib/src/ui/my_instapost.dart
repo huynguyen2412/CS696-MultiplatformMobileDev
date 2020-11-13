@@ -27,11 +27,12 @@ class _MyInstaPost extends State<MyInstaPost>{
                                         //api/instapost-query/nicknames or instapost-query/hashtags
   final String paramValue = ""; //value is used to query response//user-nickname
   final String paramKey = "nickname";
-  Future<String> _randNickname;
+  Future<String> _nickName;
+  Future<bool> newPost;
 
   @override
   void initState(){
-    _randNickname = getNickname();
+    _nickName = getNickname();
     super.initState();
   }
 
@@ -124,7 +125,7 @@ class _MyInstaPost extends State<MyInstaPost>{
         ),
       ),
       body: new FutureBuilder<String>(
-        future: _randNickname,
+        future: _nickName,
         builder: (context, AsyncSnapshot<String> snapshot){
           if(snapshot.hasError){
             return Center(
@@ -144,7 +145,7 @@ class _MyInstaPost extends State<MyInstaPost>{
                 paramValue: snapshot.data.toString(),
                 title: snapshot.data.toString(),
               )
-              );
+            );
           }else{
            return Container(
              child: CircularProgressIndicator(),
@@ -155,7 +156,7 @@ class _MyInstaPost extends State<MyInstaPost>{
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.add_circle),
         onPressed: () async{
-          _createAPost(context);
+          final postStatus = await _createAPost(context);
         },
       )
     );
