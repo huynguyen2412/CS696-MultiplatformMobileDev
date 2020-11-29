@@ -10,8 +10,18 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@eva-design/eva": "^2.0.0",
+    "@hookform/error-message": "^0.0.5",
+    "@hookform/resolvers": "^1.0.1",
+    "@ui-kitten/components": "^5.0.0",
+    "@ui-kitten/eva-icons": "^5.0.0",
     "react": "16.13.1",
-    "react-native": "0.63.3"
+    "react-hook-form": "^6.11.5",
+    "react-native": "0.63.3",
+    "react-native-keyboard-aware-scroll-view": "^0.9.3",
+    "react-native-svg": "^12.1.0",
+    "react-native-vector-icons": "^7.1.0",
+    "yup": "^0.31.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.8",
