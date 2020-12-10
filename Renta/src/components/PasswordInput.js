@@ -2,7 +2,7 @@ import React, { Components, useState } from 'react';
 import { Pressable, Text } from 'react-native';
 import { Icon, Input, Layout } from '@ui-kitten/components';
 
-export const PasswordInput = ({onChange, passwordVal, onBlur}) => {
+export const PasswordInput = ({onChange, passwordVal, onBlur, caption}) => {
   const [secureTextEntry, setSecureTextEntry] = useState(true);
 
   const toggleSecureEntry = () => {
@@ -21,7 +21,8 @@ export const PasswordInput = ({onChange, passwordVal, onBlur}) => {
         value={passwordVal}
         label='Password'
         placeholder=''
-        caption='Should start with a letter, contain at least 8 symbols include special characters'
+        caption={caption ?
+          'Should start with a letter, contain at least 8 symbols include special characters' : null}
         accessoryRight={renderIcon}
         secureTextEntry={secureTextEntry}
         onChangeText={value => onChange(value)}

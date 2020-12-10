@@ -133,6 +133,7 @@ android {
         applicationId "com.renta"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+        multiDexEnabled true
         versionCode 1
         versionName "1.0"
     }
@@ -187,6 +188,8 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
 
     implementation platform('com.google.firebase:firebase-bom:26.1.0') // Import the Firebase BoM
+
+    implementation 'com.android.support:multidex:1.0.3'
 
     implementation 'com.google.firebase:firebase-analytics'
 

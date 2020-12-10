@@ -10,10 +10,7 @@ export const validSchema = Yup.object().shape({
   email: Yup.string()
     .email('Email is not valid')
     .required('Email cannot empty'),
-  userName: Yup.string()
-    .matches(/^[a-zA-Z0-9]{1,20}$/, 'Username only alphanumeric and length 1-20')
-    .required('Username cannot empty'),
-  passWord: Yup.string()
+  password: Yup.string()
     .required('Password is empty')
     .matches(/^[a-zA-Z](?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/, 'Invalid Password')
 });

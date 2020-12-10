@@ -1,10 +1,5 @@
-import React, {Fragment} from 'react';
-import {
-  KeyboardAvoidingView,
-  StyleSheet,
-  Pressable,
-  View,
-} from 'react-native';
+import React, {Fragment, useState, useEffect} from 'react';
+import {StyleSheet, Pressable, View} from 'react-native';
 import {useForm, Controller} from 'react-hook-form';
 import {
   Input,
@@ -13,7 +8,6 @@ import {
   ApplicationProvider,
   IconRegistry,
   Text,
-  useTheme
 } from '@ui-kitten/components';
 import {EvaIconsPack} from '@ui-kitten/eva-icons';
 import * as eva from '@eva-design/eva';
@@ -22,25 +16,70 @@ import {ErrorMessage} from '@hookform/error-message';
 import {validSchema as FormValidationSchema} from '../features/formValidationSchema';
 import {yupResolver} from '@hookform/resolvers/yup';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import UserInfo from '../model/UserInfo';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import { AlertError } from '../components/AlertError';
 
-export const RegistrationForm = () => {
-  const {control, handleSubmit, errors} = useForm({
+export const RegistrationForm = ({navigation}) => {
+  const {control, handleSubmit, errors, setError} = useForm({
     mode: 'onBlur',
     resolver: yupResolver(FormValidationSchema),
   });
-  const onSubmit = (data) => console.log(data);
-  const theme = useTheme();
+  const [userInfo, setUserInfo] = useState(new UserInfo());
+  const [disableSubmit, setDisableSubmit] = useState(false);
 
-  console.log(`${theme['color-primary-default']}`)
+  const onSubmit = (info) => {
+    //avoid user submit multiple times
+    setDisableSubmit(true);
+
+    setUserInfo(userInfo.getUserInfo(info));
+    auth()
+      .createUserWithEmailAndPassword(info.email, info.password)
+      .then((response) => {
+        const uid = response.user.uid;
+        // set user info to Firestore
+        const data = {
+          id: uid,
+          email: info.email,
+          firstName: info.firstName,
+          lastName: info.lastName,
+        };
+        const usersRef = firestore().collection('Users');
+        usersRef
+          .doc(uid)
+          .set(data)
+          .then(() => {
+            navigation.navigate('HomeScreen', {user: data});
+          })
+          .catch((error) => {
+            console.log(`Can't set value ${error}`);
+            return <AlertError message={error} />;
+          });
+      })
+      .catch((error) => {
+        if (error.code === 'auth/email-already-in-use') {
+          setError('email', {
+            type: 'manual',
+            message: 'The email is already in use.',
+          });
+          return;
+        }
+        //enable to user submit again
+        setDisableSubmit(false);
+      });
+  };
 
   return (
     <Fragment>
       <IconRegistry icons={EvaIconsPack} />
       <ApplicationProvider {...eva} theme={eva.light}>
-        <Layout style={[style.entireContainer, {backgroundColor: '#3757e6' }]}>
+        <Layout style={[style.entireContainer]}>
           <Layout style={style.formContainer}>
-            <View >
-              <Text category='h4'>Registration</Text>
+            <View style={{alignItems: 'center'}}>
+              <Text category="h4" style={style.title}>
+                Registration
+              </Text>
             </View>
             <KeyboardAwareScrollView>
               <Layout>
@@ -72,8 +111,8 @@ export const RegistrationForm = () => {
                 />
               </Layout>
 
+              {/* Last Name */}
               <Layout>
-                {/* Last Name */}
                 <Controller
                   control={control}
                   render={({onChange, onBlur, value}) => (
@@ -84,6 +123,7 @@ export const RegistrationForm = () => {
                       onChangeText={(nextValue) => onChange(nextValue)}
                       onBlur={onBlur}
                       status="primary"
+                      style={style.lastName}
                     />
                   )}
                   name="lastName"
@@ -128,37 +168,8 @@ export const RegistrationForm = () => {
                 />
               </Layout>
 
+              {/* Password */}
               <Layout>
-                {/* UserName */}
-                <Controller
-                  control={control}
-                  render={({onChange, onBlur, value}) => (
-                    <Layout style={style.userName}>
-                      <Input
-                        placeholder=""
-                        value={value}
-                        onChangeText={(nextValue) => onChange(nextValue)}
-                        onBlur={onBlur}
-                        status="primary"
-                        label="UserName"
-                      />
-                    </Layout>
-                  )}
-                  name="userName"
-                  rules={{required: true}}
-                  defaultValue=""
-                />
-                <ErrorMessage
-                  errors={errors}
-                  name="userName"
-                  render={({message}) => (
-                    <Text style={style.invalidInput}>{message}</Text>
-                  )}
-                />
-              </Layout>
-
-              <Layout>
-                {/* Password */}
                 <Controller
                   control={control}
                   render={({onChange, onBlur, value}) => (
@@ -167,15 +178,16 @@ export const RegistrationForm = () => {
                       onBlur={onBlur}
                       passwordVal={value}
                       errors={errors}
+                      caption={'enable'}
                     />
                   )}
-                  name="passWord"
+                  name="password"
                   rules={{required: true}}
                   defaultValue=""
                 />
                 <ErrorMessage
                   errors={errors}
-                  name="passWord"
+                  name="password"
                   render={({message}) => (
                     <Text style={style.invalidInput}>{message}</Text>
                   )}
@@ -183,14 +195,18 @@ export const RegistrationForm = () => {
               </Layout>
 
               <Layout style={style.signUp}>
-                <Button onPress={handleSubmit(onSubmit)}>Sign Up!</Button>
-                <Pressable
+                <Button
+                  disabled={disableSubmit}
+                  onPress={handleSubmit(onSubmit)}>
+                  Sign Up!
+                </Button>
+                <Button
                   style={{marginTop: 10}}
-                  onPress={() => {
-                    console.log('Sign in');
-                  }}>
-                  <Text>Already registered? Sign in here.</Text>
-                </Pressable>
+                  onPress={() => navigation.navigate('LoginForm')}
+                  appearance="ghost"
+                  status="basic">
+                  Already registered? Sign in here.
+                </Button>
               </Layout>
             </KeyboardAwareScrollView>
           </Layout>
@@ -204,17 +220,13 @@ const style = StyleSheet.create({
   entireContainer: {
     flex: 1,
     justifyContent: 'center',
+    backgroundColor: '#3757e6',
   },
   formContainer: {
     padding: 20,
     borderWidth: 1,
     borderColor: 'blue',
     borderRadius: 15,
-  },
-  userName: {
-    borderTopColor: 'rgba(0,0,0,0.5)',
-    borderTopWidth: 0.2,
-    marginTop: 10,
   },
   signUp: {
     alignSelf: 'center',
@@ -224,7 +236,7 @@ const style = StyleSheet.create({
     color: '#d44d2c',
   },
   title: {
-    justifyContent: 'center',
-    alignContent: 'center'
-  }
+    color: '#3757e6',
+    fontWeight: '600',
+  },
 });
