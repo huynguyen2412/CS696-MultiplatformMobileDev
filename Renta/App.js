@@ -11,7 +11,7 @@ import firestore from '@react-native-firebase/firestore';
 import * as eva from '@eva-design/eva';
 import {ApplicationProvider} from '@ui-kitten/components';
 
-import { HouseCard } from './src/components/HouseCard';
+import { NewPost } from './src/containers/NewPost';
 
 const Stack = createStackNavigator();
 
@@ -57,6 +57,7 @@ const App: () => React$Node = () => {
             <Stack.Screen name="HomeScreen">
               {(props) => <HomeScreen {...props} extraData={user} />}
             </Stack.Screen>
+            <Stack.Screen name="NewPost" component={NewPost}/>
           </Stack.Navigator>
         ) : (
           <Stack.Navigator headerMode="false">

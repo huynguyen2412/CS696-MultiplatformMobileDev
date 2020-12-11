@@ -15,6 +15,7 @@ export const SearchBar = (props) => {
       <ScrollView keyboardShouldPersistTaps="handled">
         <Input
             style={styles.container}
+            placeholder="Looking for your place? :)"
             value={value}
             accessoryLeft={SearchIcon}
             onChangeText={nextValue => setValue(nextValue)}
