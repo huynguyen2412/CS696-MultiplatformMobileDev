@@ -18,7 +18,7 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import { AlertError } from '../components/AlertError';
 
-export const LoginForm = ({navigation}) => {
+export const LoginForm = ({navigation, getUser}) => {
   const {control, errors, handleSubmit, setError} = useForm();
   const [userInfo, setUserInfo] = useState(new UserInfo());
   const [disableSubmit, setDisableSubmit] = useState(false);
@@ -44,7 +44,8 @@ export const LoginForm = ({navigation}) => {
               return;
             }
             const user = userDocument.data();
-            navigation.navigate("HomeScreen", {user});
+            //set user information to user state in App.js
+            getUser(user)
           })
           .catch(error => {
             console.log(error.message);

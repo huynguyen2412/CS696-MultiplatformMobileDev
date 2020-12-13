@@ -1,14 +1,15 @@
-import React, {Component} from 'react';
-import {View, StyleSheet, ScrollView} from 'react-native';
-import {Layout, Text, Button, Icon} from '@ui-kitten/components';
-import { HeaderNavTab } from '../components/HeaderNavTab';
-import { BottomNavTab } from '../components/BottomNavTab';
-import { SearchBar } from '../components/SearchBar';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { HouseCard } from '../components/HouseCard';
+import React, {createContext} from 'react';
+import {StyleSheet} from 'react-native';
+import {Layout} from '@ui-kitten/components';
+import {HeaderNavTab} from '../components/HeaderNavTab';
+import {BottomNavTab} from '../components/BottomNavTab';
+import {SearchBar} from '../components/SearchBar';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {HouseCard} from '../components/HouseCard';
 
 export const HomeScreen = (props) => {
   const user = props.extraData;
+
   return (
     <Layout style={styles.container}>
       <Layout>
@@ -24,12 +25,12 @@ export const HomeScreen = (props) => {
             <HouseCard />
             <HouseCard />
             <HouseCard />
-          </KeyboardAwareScrollView>     
+          </KeyboardAwareScrollView>
           <Layout style={styles.bottomTab}>
-            <BottomNavTab />
-          </Layout> 
-        </Layout>        
-      </Layout>    
+            <BottomNavTab userInfo={user}/>
+          </Layout>
+        </Layout>
+      </Layout>
     </Layout>
   );
 };
@@ -44,10 +45,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   body: {
-    backgroundColor: "#f0f2f7"
+    backgroundColor: '#f0f2f7',
   },
   bottomTab: {
-    backgroundColor: "#f0f2f7",
+    backgroundColor: '#f0f2f7',
     justifyContent: 'flex-end',
     margin: -8,
   },

@@ -23,13 +23,14 @@ const useBottomNavigationState = (initialState = 0) => {
   };
 };
 
-export const BottomNavTab = () => {
+export const BottomNavTab = (props) => {
   // const bottomState = useBottomNavigationState();
+  const userInfo = props.userInfo;
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const navigation = useNavigation();
 
-  const navigateNewPost = () => navigation.navigate("NewPost");
-  const navigateSetting = () => navigation.navigate("Setting");
+  const navigateNewPost = () => navigation.navigate("NewPost", {user: userInfo});
+  const navigateSetting = () => navigation.navigate("Setting", {user: userInfo});
 
   const navigateToTab = (index) => {
     setSelectedIndex(index);

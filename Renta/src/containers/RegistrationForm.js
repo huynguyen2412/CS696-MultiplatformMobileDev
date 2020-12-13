@@ -21,7 +21,7 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { AlertError } from '../components/AlertError';
 
-export const RegistrationForm = ({navigation}) => {
+export const RegistrationForm = ({navigation, getUser}) => {
   const {control, handleSubmit, errors, setError} = useForm({
     mode: 'onBlur',
     resolver: yupResolver(FormValidationSchema),
@@ -50,7 +50,8 @@ export const RegistrationForm = ({navigation}) => {
           .doc(uid)
           .set(data)
           .then(() => {
-            navigation.navigate('HomeScreen', {user: data});
+            //set user information to user state in App.js
+            getUser(data);
           })
           .catch((error) => {
             console.log(`Can't set value ${error}`);
@@ -63,7 +64,6 @@ export const RegistrationForm = ({navigation}) => {
             type: 'manual',
             message: 'The email is already in use.',
           });
-          return;
         }
         //enable to user submit again
         setDisableSubmit(false);

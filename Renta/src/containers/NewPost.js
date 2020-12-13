@@ -1,102 +1,219 @@
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, Image, FlatList, Dimensions} from 'react-native';
+import {
+  StyleSheet,
+  Image,
+  FlatList,
+  Dimensions,
+  KeyboardAvoidingView,
+} from 'react-native';
 import {Layout, Text, Input, Button, Icon} from '@ui-kitten/components';
 import ImagePicker from 'react-native-image-crop-picker';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {useForm} from 'react-hook-form';
+import { FormInput } from '../components/FormInput';
+import validSchema from '../features/postValidationSchema';
+import {yupResolver} from '@hookform/resolvers/yup';
+import firestore from '@react-native-firebase/firestore';
+import { AlertError } from '../components/AlertError';
 
-const PostIcon = (props) => (
-  <Icon {...props} name='paper-plane'/>
-);
-
-const CancelIcon = (props) => (
-  <Icon {...props} name='paper-plane'/>
-);
-
-const ImageIcon = (props) => (
-  <Icon {...props} name='image-2'/>
-);
+const PostIcon = (props) => <Icon {...props} name="paper-plane" />;
+const CancelIcon = (props) => <Icon {...props} name="backspace" />;
+const ImageIcon = (props) => <Icon {...props} name="image-2" />;
+const TakePhotoIcon = (props) => <Icon {...props} name="camera-outline" />;
 
 const AddImage = ({setData}) => {
   return (
     <Button
+      style={styles.addImage}
       accessoryLeft={ImageIcon}
       onPress={() =>
         ImagePicker.openPicker({
           multiple: true,
           includeBase64: true,
+          compressImageMaxWidth: 600,
+          compressImageMaxHeight: 800,
           compressImageQuality: 0.7,
         })
-          .then((images) => setData(images))
+          .then((images) => {
+            setData(images);
+          })
           .catch((error) => console.log(error))
-      }
-    />
+      }>
+      Add Photo(s)
+    </Button>
   );
 };
 
-const PostDetail = ({setPostData}) => {
+const TakePhoto = ({setData, data}) => {
   return (
-    <Layout style={{backgroundColor: "#F5FCFF"}}>
+    <Button
+      style={styles.addImage}
+      accessoryLeft={TakePhotoIcon}
+      onPress={() =>
+        ImagePicker.openCamera({
+          mediaType: 'photo',
+          width: 300,
+          height: 400,
+          compressImageMaxWidth: 600,
+          compressImageMaxHeight: 800,
+          includeBase64: true,
+          compressImageQuality: 0.7,
+        }).then((image) => {
+          let newArr = [...data, image];
+          setData(newArr);
+        })}
+    >
+      Take a Photo
+    </Button>
+  );
+};
+
+const PostDetail = ({getPhoto}) => {
+  const navigation = useNavigation();
+  const userInfo = useRoute().params.user;
+  const {control, handleSubmit, errors} = useForm({
+    resolver: yupResolver(validSchema)
+  });
+  const [disableSubmit, setDisableSubmit] = useState(false);
+  const navigateHome = () => navigation.goBack();
+  //submit the post 
+  const onSubmit = async (postInfo) => {
+    //avoid multiple submit
+    setDisableSubmit(true);
+    const post = {...postInfo, ...{photo: getPhoto}};
+    const uid = userInfo.id;
+    const photosRef = await firestore().collection('Users').doc(uid).collection("Posts");
+    console.log("photo ref", photosRef);
+    try {
+      const postRef = await photosRef.add(post);
+      console.log("postRef", postRef);
+      // await postRef.add(post);
+    } catch (error) {
+      console.log(`Can't submit the post ${error}`);
+      setDisableSubmit(false);
+      return <AlertError message={error}/>
+    }
+  };
+
+  return (
+    <Layout style={{backgroundColor: '#F5FCFF'}}>
       <Layout style={{flexDirection: 'row', backgroundColor: '#F5FCFF'}}>
-        <Input
+        <FormInput
+          control={control}
+          controlName='price'
           label="Price"
-          style={{flex: 1, marginLeft: 10, marginRight: 5}}
-        />
-        <Input
+          style={{flex: 1, marginLeft: 5, marginRight: 5}}
+          errors={errors}/>
+        
+        <FormInput
+          control={control}
+          controlName="room"
           style={{flex: 3, marginLeft: 5, marginRight: 5}}
           label="Number of rooms/Area"
           caption="Eg: 3bds | 2 ba | 1,234 sqft"
+          errors={errors}/>                  
+      </Layout>
+
+      <FormInput
+        control={control}
+        controlName="street"
+        style={{marginHorizontal: 5}}
+        label="Street"     
+        errors={errors}   
+      />
+
+      <Layout
+        style={{flexDirection: 'row', flex: 1, backgroundColor: '#F5FCFF'}}>
+        <FormInput
+          control={control}
+          controlName="city"
+          label="City" 
+          style={{flex: 2, marginHorizontal: 5}}
+          errors={errors}
+        />
+
+        <FormInput 
+          control={control}
+          label="State" 
+          controlName="state"
+          style={{flex: 1, marginHorizontal: 5}}
+          errors={errors} 
+        />
+        <FormInput 
+          control={control}
+          controlName="zipcode"
+          label="Zipcode" 
+          style={{flex: 1, marginHorizontal: 5}} 
+          errors={errors} 
         />
       </Layout>
-      <Input label="Address" style={{marginHorizontal: 5}} />
-      <Input
+
+      <FormInput
+        control={control}
+        controlName="description"
+        label="Description"
         multiline={true}
         style={{marginHorizontal: 5, marginTop: 5}}
-        textStyle={{minHeight: 60}}
+        textStyle={{minHeight: 70}}
         placeholder="Description"
+        errors={errors} 
       />
       <Layout style={styles.submitCancel}>
-        <Button style={{width: '30%'}}>Cancel</Button>
         <Button
           style={{width: '30%'}}
-          accessoryLeft={PostIcon}
-        />        
+          accessoryLeft={CancelIcon}
+          status="danger"
+          appearance="outline"
+          onPress={navigateHome}
+        />
+        <Button 
+          disableSubmit={disableSubmit}
+          style={{width: '30%'}} 
+          accessoryLeft={PostIcon} 
+          onPress={handleSubmit(onSubmit)}/>
       </Layout>
     </Layout>
   );
 };
 
-export const NewPost = ({user}) => {
-  const [imageResponse, setImageResponse] = useState();
-  console.log(imageResponse);
+export const NewPost = () => {
+  // const userData = user;
+  const [imageResponse, setImageResponse] = useState([]);
 
-  //display 3 images for each row
+  //display 2 images each slide
   const windowWidth = Dimensions.get('window').width;
-  const itemWidth = windowWidth / 3;
+  const itemWidth = windowWidth / 2;
 
   return (
     <Layout style={styles.container}>
-      <Layout style={styles.imageContainer}>
-        <FlatList
-          data={imageResponse}
-          keyExtractor={(item) => item.index}
-          numColumns={3}
-          renderItem={({item, index}) => (
-            <Image
-              source={{
-                uri: `data:${item.mime};base64,${item.data}`,
-              }}
-              style={[styles.imageItem, {width: itemWidth}]}
-              key={index}
-            />
-          )}
-        />
+      <Layout>
+        {imageResponse && (
+          <FlatList
+            showsHorizontalScrollIndicator={false}
+            style={{backgroundColor: '#F5FCFF'}}
+            horizontal={true}
+            data={imageResponse}
+            keyExtractor={(item, index) => index.toString()}
+            renderItem={({item}) => {
+              return (
+                <Image
+                  source={{uri: `data:${item.mime};base64,${item.data}`}}
+                  style={[styles.imageItem, {width: itemWidth}]}
+                />
+              );
+            }}
+          />
+        )}
       </Layout>
 
-      <AddImage setData={setImageResponse} />
+      <Layout style={styles.photoButtons}>
+        <AddImage setData={setImageResponse} />
+        <TakePhoto setData={setImageResponse} data={imageResponse} />
+      </Layout>
 
       <KeyboardAwareScrollView>
-        <PostDetail />
+        <PostDetail getPhoto={imageResponse}/>
       </KeyboardAwareScrollView>
     </Layout>
   );
@@ -107,24 +224,32 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F5FCFF',
   },
+  photoButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: '#F5FCFF',
+  },
   button: {
     marginVertical: 24,
     marginHorizontal: 24,
   },
   imageItem: {
     alignItems: 'center',
-    height: 150,
-    margin: 1,
+    height: 200,
+    margin: 2,
   },
   imageContainer: {
     flex: 1,
     flexDirection: 'row',
-    backgroundColor: '#F5FCFF'
+    backgroundColor: '#F5FCFF',
   },
   submitCancel: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     backgroundColor: '#F5FCFF',
     marginTop: 10,
+  },
+  addImage: {
+    margin: 10,
   },
 });

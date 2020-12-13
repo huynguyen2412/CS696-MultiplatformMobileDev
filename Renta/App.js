@@ -11,7 +11,7 @@ import firestore from '@react-native-firebase/firestore';
 import * as eva from '@eva-design/eva';
 import {ApplicationProvider} from '@ui-kitten/components';
 
-import { NewPost } from './src/containers/NewPost';
+import {NewPost} from './src/containers/NewPost';
 
 const Stack = createStackNavigator();
 
@@ -29,11 +29,13 @@ const App: () => React$Node = () => {
           .get()
           .then((document) => {
             const userData = document.data();
+            //if there is no user exist navigate to login
             setLoading(false);
             setUser(userData);
           })
           .catch((error) => {
             setLoading(false);
+            console.log(`Not found user ${error}`);
           });
       } else {
         setLoading(false);
@@ -52,34 +54,34 @@ const App: () => React$Node = () => {
   return (
     <ApplicationProvider {...eva} theme={eva.light}>
       <NavigationContainer>
-        {user ? (
-          <Stack.Navigator headerMode="false">
-            <Stack.Screen name="HomeScreen">
-              {(props) => <HomeScreen {...props} extraData={user} />}
-            </Stack.Screen>
-            <Stack.Screen name="NewPost" component={NewPost}/>
-          </Stack.Navigator>
-        ) : (
-          <Stack.Navigator headerMode="false">
-            <Stack.Screen name="LoginForm" component={LoginForm} />
-            <Stack.Screen
-              name="RegisterForm"
-              component={RegistrationForm}
-              options={{title: 'Registration'}}
-            />
-          </Stack.Navigator>
-        )}
+        <Stack.Navigator headerMode="false">
+          {user ? (
+            <>
+              <Stack.Screen name="HomeScreen">
+                {(props) => <HomeScreen {...props} extraData={user} />}
+              </Stack.Screen>
+              <Stack.Screen name="NewPost" component={NewPost} />
+            </>
+          ) : (
+            <>
+              <Stack.Screen
+                name="LoginForm"
+                component={LoginForm}
+                getUser={setUser}
+              />
+              <Stack.Screen
+                name="RegisterForm"
+                component={RegistrationForm}
+                options={{title: 'Registration'}}
+                getUser={setUser}
+              />
+            </>
+          )}
+        </Stack.Navigator>
       </NavigationContainer>
     </ApplicationProvider>
-  )
-
-  // return(
-  //    <ApplicationProvider {...eva} theme={eva.light}>
-  //      <HouseCard />
-  //    </ApplicationProvider>
-  // );
-
-}
+  );
+};
 
 const style = StyleSheet.create({
   loading: {
