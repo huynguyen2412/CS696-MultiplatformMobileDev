@@ -2,10 +2,13 @@ import React, {useState} from 'react';
 import { StyleSheet, View, Image, Pressable } from 'react-native';
 import { Button, Card, Layout, Text } from '@ui-kitten/components';
 
-const HouseImage = (props) => (
+const HouseImage = ({source}) => (
   <Image 
     style={styles.cardImage}
-    source={{uri: props.source}}
+    source={
+      source ? { uri : `data:${source.mime};base64,${source.data}` } 
+                : require('../assets/images/no_image.jpg')
+    }
   />
 );
 
@@ -20,10 +23,9 @@ const Header = (props) => (
 );
 
 
-export const HouseCard = ({navigation}) => {
-  const src = 'https://photos.zillowstatic.com/fp/98e883fe6f5d6c7c1c4bcb073776547c-p_e.jpg';
-
-  
+export const HouseCard = ({ item }) => {
+  const photo = item.photo ? item.photo[0] : null;
+  console.log("My photo", photo); 
   return (
     <Pressable
       onPress={()=> console.log("Open new post")}
@@ -35,11 +37,13 @@ export const HouseCard = ({navigation}) => {
           },
           styles.wrapperCustom
         ]}
-    >
+    > 
       <Layout level='2' style={styles.container}>
-        <HouseImage source={src} />       
-        <Header price="3,000" info="3 bds | 2 ba | 1,614 sqft"/>
-        <Text style={styles.textInfo}>1234 ABCD, San Diego, CA 92126</Text>
+        <HouseImage source={photo} />
+        <Header price={item.price} info={item.room}/>
+        <Text style={styles.textInfo}>
+          {item.street.toUpperCase() + ',' + item.city.toUpperCase() + ',' + item.state.toUpperCase() + ', ' + item.zipcode}
+        </Text>
       </Layout>
     </Pressable>
   );

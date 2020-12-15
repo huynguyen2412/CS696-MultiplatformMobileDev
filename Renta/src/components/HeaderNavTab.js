@@ -1,9 +1,6 @@
 import React from 'react';
-import {SafeAreaView, StyleSheet, Pressable} from 'react-native';
+import {SafeAreaView, StyleSheet} from 'react-native';
 import {
-  Button,
-  Divider,
-  Layout,
   TopNavigation,
   Icon,
   TopNavigationAction,
@@ -18,7 +15,7 @@ const MessageAction = (props) => (
   <TopNavigationAction icon={MessageIcon} onPress={props.action} />
 );
 
-export const HeaderNavTab = ({navigation, title}) => {
+export const HeaderNavTab = ({title}) => {
   const navigateMessage = () => {
     console.log('Navigate to message');
     // navigation.navigate('Message');

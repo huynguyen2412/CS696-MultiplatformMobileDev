@@ -4,6 +4,7 @@ import {View, StyleSheet, ActivityIndicator} from 'react-native';
 import {RegistrationForm} from './src/containers/RegistrationForm';
 import {LoginForm} from './src/containers/LoginForm';
 import {HomeScreen} from './src/containers/HomeScreen';
+import {SettingScreen} from './src/containers/SettingScreen';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import auth from '@react-native-firebase/auth';
@@ -61,20 +62,18 @@ const App: () => React$Node = () => {
                 {(props) => <HomeScreen {...props} extraData={user} />}
               </Stack.Screen>
               <Stack.Screen name="NewPost" component={NewPost} />
+              <Stack.Screen name="SettingScreen">
+                {(props) => <SettingScreen setUser={setUser}/>}
+              </Stack.Screen>
             </>
           ) : (
             <>
-              <Stack.Screen
-                name="LoginForm"
-                component={LoginForm}
-                getUser={setUser}
-              />
-              <Stack.Screen
-                name="RegisterForm"
-                component={RegistrationForm}
-                options={{title: 'Registration'}}
-                getUser={setUser}
-              />
+              <Stack.Screen name="LoginForm" >
+                {(props) => <LoginForm getUser={setUser} />} 
+              </Stack.Screen>
+              <Stack.Screen name="RegisterForm" options={{title: 'Registration'}}>
+                {(props) => <RegistrationForm getUser={setUser}/>}
+              </Stack.Screen>
             </>
           )}
         </Stack.Navigator>

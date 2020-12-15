@@ -77,22 +77,25 @@ const PostDetail = ({getPhoto}) => {
   });
   const [disableSubmit, setDisableSubmit] = useState(false);
   const navigateHome = () => navigation.goBack();
-  //submit the post 
+
+  //add a post document to user's Posts collection
   const onSubmit = async (postInfo) => {
     //avoid multiple submit
     setDisableSubmit(true);
-    const post = {...postInfo, ...{photo: getPhoto}};
+
+    const createdAt = firestore.FieldValue.serverTimestamp();
+    const post = {...postInfo, ...{photo: getPhoto}, createdAt};
     const uid = userInfo.id;
-    const photosRef = await firestore().collection('Users').doc(uid).collection("Posts");
-    console.log("photo ref", photosRef);
+    const postsRef = await firestore().collection('Users').doc(uid).collection("Posts");
     try {
-      const postRef = await photosRef.add(post);
-      console.log("postRef", postRef);
-      // await postRef.add(post);
+      const postResponse = await postsRef.add(post);
+      if(postResponse)
+        navigation.goBack();
     } catch (error) {
+      const errMessage = "Can't submit the post " + error;
       console.log(`Can't submit the post ${error}`);
       setDisableSubmit(false);
-      return <AlertError message={error}/>
+      return <AlertError message={errMessage}/>
     }
   };
 
@@ -111,7 +114,7 @@ const PostDetail = ({getPhoto}) => {
           controlName="room"
           style={{flex: 3, marginLeft: 5, marginRight: 5}}
           label="Number of rooms/Area"
-          caption="Eg: 3bds | 2 ba | 1,234 sqft"
+          caption="Eg: 3bds | 2 ba | 1234 sqft"
           errors={errors}/>                  
       </Layout>
 
@@ -235,7 +238,7 @@ const styles = StyleSheet.create({
   },
   imageItem: {
     alignItems: 'center',
-    height: 200,
+    height: 150,
     margin: 2,
   },
   imageContainer: {
