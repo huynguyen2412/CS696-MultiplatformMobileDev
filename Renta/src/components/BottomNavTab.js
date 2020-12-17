@@ -26,7 +26,7 @@ const useBottomNavigationState = (userInfo) => {
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const navigateNewPost = () => navigation.navigate("NewPost", {user: userInfo});
   const navigateSetting = () => navigation.navigate("SettingScreen", {user: userInfo});
-  const navigateListRenta = () => navigation.navigate("ListRentaScreen", {user: userInfo});
+  const navigateListRenta = () => navigation.navigate("MyPostScreen");
   return { 
     selectedIndex, 
     onSelect: (index) => {

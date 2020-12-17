@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import { StyleSheet, View, Image, Pressable } from 'react-native';
 import { Button, Card, Layout, Text } from '@ui-kitten/components';
+import { useNavigation } from '@react-navigation/native';
 
 const HouseImage = ({source}) => (
   <Image 
@@ -22,39 +23,50 @@ const Header = (props) => (
   </Layout>
 );
 
-
-export const HouseCard = ({ item }) => {
+const CardItem = ({item}) => {
   const photo = item.photo ? item.photo[0] : null;
-  console.log("My photo", photo); 
+  const navigation = useNavigation();
+  const navigateHome = () => navigation.push("RentaViewScreen", {item});
+
   return (
     <Pressable
-      onPress={()=> console.log("Open new post")}
+      onPress={navigateHome}
       style={({ pressed }) => [
           {
-            backgroundColor: (pressed
+            backgroundColor: pressed
               ? 'rgb(210, 230, 255)'
-              : 'white')
+              : 'white'
           },
           styles.wrapperCustom
         ]}
-    > 
+    >
       <Layout level='2' style={styles.container}>
         <HouseImage source={photo} />
         <Header price={item.price} info={item.room}/>
         <Text style={styles.textInfo}>
-          {item.street.toUpperCase() + ',' + item.city.toUpperCase() + ',' + item.state.toUpperCase() + ', ' + item.zipcode}
+          {item.street.toUpperCase() + ', ' + item.city.toUpperCase() + ', '  + item.state.toUpperCase() + ', ' + item.zipcode}
         </Text>
       </Layout>
     </Pressable>
   );
 }
 
+
+export const HouseCard = ({ item }) => {
+
+  return (
+    <Layout> 
+      <CardItem item={item} />
+    </Layout>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     borderBottomWidth: 0.3,
-    borderColor: 'rgba(158, 150, 150, .5)',
-    height: 150,
-    marginBottom: 5
+    borderColor: '#c7cbd1',
+    height: 170,
+    marginBottom: 8,
   },
   header: {
     flexDirection: 'row',
@@ -63,14 +75,14 @@ const styles = StyleSheet.create({
   },
   cardImage: {
     height: '70%',
-    resizeMode: 'stretch'
   },
   textInfo : {
     fontWeight: "bold",
-    paddingLeft: 5
+    paddingLeft: 5,
+    marginTop: 5
   },
   wrapperCustom: {
     borderRadius: 5,
-    padding: 5
+    padding: 5,
   },
 });

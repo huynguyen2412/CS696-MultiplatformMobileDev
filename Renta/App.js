@@ -4,7 +4,10 @@ import {View, StyleSheet, ActivityIndicator} from 'react-native';
 import {RegistrationForm} from './src/containers/RegistrationForm';
 import {LoginForm} from './src/containers/LoginForm';
 import {HomeScreen} from './src/containers/HomeScreen';
-import {SettingScreen} from './src/containers/SettingScreen';
+import { MyPostScreen } from './src/containers/MyPostScreen';
+import { SettingScreen } from './src/containers/SettingScreen';
+import { RentaViewScreen } from './src/containers/RentaViewScreen';
+import { NewMessageScreen } from './src/containers/NewMessageScreen';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import auth from '@react-native-firebase/auth';
@@ -65,6 +68,9 @@ const App: () => React$Node = () => {
               <Stack.Screen name="SettingScreen">
                 {(props) => <SettingScreen setUser={setUser}/>}
               </Stack.Screen>
+              <Stack.Screen name="MyPostScreen" component={MyPostScreen}/>              
+              <Stack.Screen name="RentaViewScreen" component={RentaViewScreen}/>              
+              <Stack.Screen name="NewMessageScreen" component={NewMessageScreen}/>              
             </>
           ) : (
             <>

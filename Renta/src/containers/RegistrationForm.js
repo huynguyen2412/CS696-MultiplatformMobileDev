@@ -20,8 +20,10 @@ import UserInfo from '../model/UserInfo';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { AlertError } from '../components/AlertError';
+import { useNavigation } from '@react-navigation/native';
 
-export const RegistrationForm = ({navigation, getUser}) => {
+export const RegistrationForm = ({getUser}) => {
+  const navigation = useNavigation();
   const {control, handleSubmit, errors, setError} = useForm({
     mode: 'onBlur',
     resolver: yupResolver(FormValidationSchema),

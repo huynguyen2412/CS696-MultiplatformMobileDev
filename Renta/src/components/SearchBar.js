@@ -7,7 +7,7 @@ const SearchIcon = (props) => (
   <Icon {...props} name="search-outline"/>
 );
 
-export const SearchBar = (props) => {
+export const SearchBar = ({setSearchKey}) => {
   const [value, setValue] = useState("");
 
   return(    
@@ -19,6 +19,10 @@ export const SearchBar = (props) => {
             value={value}
             accessoryLeft={SearchIcon}
             onChangeText={nextValue => setValue(nextValue)}
+            onEndEditing={() => {
+              setSearchKey(value);
+              setValue("");
+            }}
           />
       </ScrollView>
     </KeyboardAvoidingView>

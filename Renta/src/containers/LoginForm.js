@@ -17,8 +17,10 @@ import UserInfo from '../model/UserInfo';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import { AlertError } from '../components/AlertError';
+import { useNavigation } from '@react-navigation/native';
 
-export const LoginForm = ({navigation, getUser}) => {
+export const LoginForm = ({getUser}) => {
+  const navigation = useNavigation();
   const {control, errors, handleSubmit, setError} = useForm();
   const [userInfo, setUserInfo] = useState(new UserInfo());
   const [disableSubmit, setDisableSubmit] = useState(false);

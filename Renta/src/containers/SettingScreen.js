@@ -4,6 +4,7 @@ import {
   Layout,
   Text,
   TopNavigation,
+  TopNavigationAction,
   Icon,
   Button
 } from '@ui-kitten/components';
@@ -13,9 +14,16 @@ import { useNavigation } from '@react-navigation/native';
 const SignoutIcon = (props) => (
   <Icon {...props} name="log-out-outline"/>
 );
+
+const BackIcon = (props) => (
+  <Icon {...props} name="arrow-back" fill='white'/>
+);
+
+const BackAction = (props) => (
+  <TopNavigationAction icon={BackIcon} onPress={props.action} />
+);
+
 const SignOut = (props) => {
-  
-  const navigation = useNavigation();
   return (
     <Layout style={styles.settingItem}>
       <Button 
@@ -25,7 +33,7 @@ const SignOut = (props) => {
             .then(() => {
               props.setUser(null);
             })
-            .catch((error) => console.log("User can't sign out. ",error));          
+            .catch((error) => console.log("User can't sign out.",error));          
         }}
         accessoryLeft={SignoutIcon}
         appearance="ghost"
@@ -40,6 +48,9 @@ const SignOut = (props) => {
 
 
 export const SettingScreen = (props) => {
+  const navigation = useNavigation();
+  const navigateHome = () => navigation.navigate("HomeScreen");
+
   return (
     <SafeAreaView>
       <TopNavigation
@@ -50,6 +61,7 @@ export const SettingScreen = (props) => {
         )}
         alignment="center"
         style={styles.headerNav}
+        accessoryLeft={() => <BackAction action={navigateHome}/>}
       />
       <ScrollView>
         <SignOut setUser={props.setUser}/>

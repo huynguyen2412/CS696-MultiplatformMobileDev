@@ -17,7 +17,6 @@ const MessageAction = (props) => (
 
 export const HeaderNavTab = ({title}) => {
   const navigateMessage = () => {
-    console.log('Navigate to message');
     // navigation.navigate('Message');
   };
 

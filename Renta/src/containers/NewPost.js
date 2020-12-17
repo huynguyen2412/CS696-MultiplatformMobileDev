@@ -1,12 +1,11 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   StyleSheet,
   Image,
   FlatList,
   Dimensions,
-  KeyboardAvoidingView,
 } from 'react-native';
-import {Layout, Text, Input, Button, Icon} from '@ui-kitten/components';
+import {Layout, Button, Icon} from '@ui-kitten/components';
 import ImagePicker from 'react-native-image-crop-picker';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
@@ -83,14 +82,19 @@ const PostDetail = ({getPhoto}) => {
     //avoid multiple submit
     setDisableSubmit(true);
 
+    //intergration with search keywords
+    for(const key in postInfo){
+      postInfo[key] = postInfo[key].toUpperCase();
+    }
     const createdAt = firestore.FieldValue.serverTimestamp();
-    const post = {...postInfo, ...{photo: getPhoto}, createdAt};
-    const uid = userInfo.id;
-    const postsRef = await firestore().collection('Users').doc(uid).collection("Posts");
+    const authorID = userInfo.id;
+    const post = {...postInfo, ...{photo: getPhoto}, createdAt, authorID};
+    const postsRef = await firestore().collection('Posts');
     try {
       const postResponse = await postsRef.add(post);
-      if(postResponse)
-        navigation.goBack();
+      const postRef = await postResponse
+                        .update({postID: postResponse.id})
+                        .then(() => navigateHome());
     } catch (error) {
       const errMessage = "Can't submit the post " + error;
       console.log(`Can't submit the post ${error}`);
@@ -181,7 +185,6 @@ const PostDetail = ({getPhoto}) => {
 };
 
 export const NewPost = () => {
-  // const userData = user;
   const [imageResponse, setImageResponse] = useState([]);
 
   //display 2 images each slide
