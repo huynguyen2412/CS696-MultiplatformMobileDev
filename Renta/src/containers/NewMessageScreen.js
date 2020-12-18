@@ -69,6 +69,7 @@ export const NewMessageScreen = () => {
     const createAt = firestore.FieldValue.serverTimestamp();
     const myMessage = new MessagePOJO(createAt, myInfo.uid, message);
 
+    let chatID = "";
     if (snapshot.empty){
       const data = {
         landlordID : postInfo.authorID,
@@ -77,9 +78,21 @@ export const NewMessageScreen = () => {
       };
       try{
         const initThread = await chatsRef.add(data);
-        const chatID = await initThread.update({ chatID: initThread.id });
+        chatID = initThread.id;
+        await initThread.update({ chatID: initThread.id });
         const messageRef = await initThread.collection('Messages');
-        const submitMessage = await messageRef.add(myMessage);
+        await messageRef.add(myMessage);  
+
+        //add chatIDs to both renter and landlord's User collection
+        //to get query from messenger
+        const landlordRef = await firestore().collection('Users').doc(postInfo.authorID);
+        const renterRef = await firestore().collection('Users').doc(myInfo.uid);                
+        const landlordChatIDs = await landlordRef.update({
+          chatIDs: firestore.FieldValue.arrayUnion(chatID)
+        });
+        const renterChatIDs = await renterRef.update({
+          chatIDs: firestore.FieldValue.arrayUnion(chatID)
+        });
         navigateHomeScreen();
       }catch(error){
         console.log("Can't submit the message. ", error);
@@ -98,7 +111,7 @@ export const NewMessageScreen = () => {
         console.log("Can't send another message to landlord. ", error);
         setDisableSend(false);
       }
-    }      
+    }    
   };
 
   return (

@@ -6,6 +6,7 @@ import {
   TopNavigationAction,
   Text
 } from '@ui-kitten/components';
+import { useNavigation } from '@react-navigation/native';
 
 const MessageIcon = (props) => (
   <Icon {...props} name="message-circle-outline" fill="#eaedf2" />
@@ -16,9 +17,8 @@ const MessageAction = (props) => (
 );
 
 export const HeaderNavTab = ({title}) => {
-  const navigateMessage = () => {
-    // navigation.navigate('Message');
-  };
+  const navigation = useNavigation();
+  const navigateMessage = () => navigation.navigate("MyMessenger");
 
   return (
     <SafeAreaView>

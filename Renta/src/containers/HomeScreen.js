@@ -9,6 +9,7 @@ import firestore from '@react-native-firebase/firestore';
 
 export const HomeScreen = (props) => {
   const user = props.extraData;
+  const fullname = user.firstName.toUpperCase() + ' ' + user.lastName.toUpperCase();
   const [myPosts, setMyPosts] = useState([]);
   const [searchKey, setSearchKey] = useState('');
 
@@ -22,15 +23,15 @@ export const HomeScreen = (props) => {
                           : await postsRef.where('city', '==', searchKey.toUpperCase()).get();
       const posts = await snapshot.docs.map((item) => item.data());
       setMyPosts(posts)
-      console.log(snapshot);
     }
-    searchResult();
+    const observer = searchResult();
+    return () => observer;
   }, [searchKey]);
 
   return (
     <Layout style={styles.container}>
       <Layout>
-        <HeaderNavTab title="Renta" />
+        <HeaderNavTab title={fullname} />
       </Layout>
       <Layout style={{flex: 1}}>
         <Layout style={{flex: 1, justifyContent: 'space-between'}}>

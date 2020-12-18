@@ -1,21 +1,24 @@
 import 'react-native-gesture-handler';
 import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, ActivityIndicator} from 'react-native';
-import {RegistrationForm} from './src/containers/RegistrationForm';
-import {LoginForm} from './src/containers/LoginForm';
-import {HomeScreen} from './src/containers/HomeScreen';
-import { MyPostScreen } from './src/containers/MyPostScreen';
-import { SettingScreen } from './src/containers/SettingScreen';
-import { RentaViewScreen } from './src/containers/RentaViewScreen';
-import { NewMessageScreen } from './src/containers/NewMessageScreen';
+import {
+  LoginForm,
+  RegistrationForm,
+  HomeScreen,
+  MyPostScreen,
+  NewPost,
+  RentaViewScreen,
+  SettingScreen,
+  NewMessageScreen,
+  MyMessenger,
+  ChatThread
+} from './src/containers/index';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import * as eva from '@eva-design/eva';
 import {ApplicationProvider} from '@ui-kitten/components';
-
-import {NewPost} from './src/containers/NewPost';
 
 const Stack = createStackNavigator();
 
@@ -66,19 +69,29 @@ const App: () => React$Node = () => {
               </Stack.Screen>
               <Stack.Screen name="NewPost" component={NewPost} />
               <Stack.Screen name="SettingScreen">
-                {(props) => <SettingScreen setUser={setUser}/>}
+                {(props) => <SettingScreen setUser={setUser} />}
               </Stack.Screen>
-              <Stack.Screen name="MyPostScreen" component={MyPostScreen}/>              
-              <Stack.Screen name="RentaViewScreen" component={RentaViewScreen}/>              
-              <Stack.Screen name="NewMessageScreen" component={NewMessageScreen}/>              
+              <Stack.Screen name="MyPostScreen" component={MyPostScreen} />
+              <Stack.Screen
+                name="RentaViewScreen"
+                component={RentaViewScreen}
+              />
+              <Stack.Screen
+                name="NewMessageScreen"
+                component={NewMessageScreen}
+              />
+              <Stack.Screen name="MyMessenger" component={MyMessenger} />
+              <Stack.Screen name="ChatThread" component={ChatThread} />
             </>
           ) : (
             <>
-              <Stack.Screen name="LoginForm" >
-                {(props) => <LoginForm getUser={setUser} />} 
+              <Stack.Screen name="LoginForm">
+                {(props) => <LoginForm getUser={setUser} />}
               </Stack.Screen>
-              <Stack.Screen name="RegisterForm" options={{title: 'Registration'}}>
-                {(props) => <RegistrationForm getUser={setUser}/>}
+              <Stack.Screen
+                name="RegisterForm"
+                options={{title: 'Registration'}}>
+                {(props) => <RegistrationForm getUser={setUser} />}
               </Stack.Screen>
             </>
           )}
