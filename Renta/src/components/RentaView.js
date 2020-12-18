@@ -74,8 +74,10 @@ export const RentaView = ({item}) => {
               <Button 
                 style={{width: '30%'}} 
                 accessoryLeft={ContactIcon}
-                onPress={navigateNewMessage}
-              />
+                onPress={navigateNewMessage}                
+              >
+                Contact
+              </Button>
           }
         </Layout>
       </Layout>
