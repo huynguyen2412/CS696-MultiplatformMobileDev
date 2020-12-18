@@ -18,6 +18,7 @@ const MyMessage = ({textData, style}) => {
   return (
     <Layout style={styles.myTextContainer}>
       <Text style={style}>{textData}</Text>
+      <Text> Me </Text>
     </Layout>
   )
 };
@@ -45,47 +46,46 @@ export const ChatThread = () => {
   const navigation = useNavigation();
   const { myuid, chatID } = route.params;
   const [messageList, setMessageList] = useState([]);
-  const [response, setResponse] = useState("");
-  const {control, errors, handleSubmit, setError} = useForm();
+  const {control, handleSubmit, reset} = useForm();
 
   const navigateHome = () => navigation.goBack();
 
-  const sendResponse = (value) => {
-    console.log("My text response", value)
-    // if(response !== ""){
-      
-    // }
-    // const timestamp = firestore.FieldValue.serverTimestamp();
-    // const myMessage = new MessagePOJO(timestamp, myuid, myText);    
-    // try {
-    //   const chatRef = await firestore().collection('Chats').doc(chatID);
-    //   const messagesRef = await chatRef.collection('Messages');
-    //   const updateMessage = await messagesRef.add(myMessage);
-    //   setResponse("");
-    // } catch (error) {
-    //   console.log("Encounted error ", error)
-    // }
+  const onSubmit = async (data, e) => {
+    if(data.messageInput !== ""){
+      const timestamp = firestore.FieldValue.serverTimestamp();
+      const myMessage = new MessagePOJO(timestamp, myuid, data.messageInput);   
+      try {
+        const chatRef = await firestore().collection('Chats').doc(chatID);
+        const messagesRef = await chatRef.collection('Messages');
+        const updateMessage = await messagesRef.add(myMessage);
+        reset();
+      } catch (error) {
+        console.log("Encounted error ", error)
+      }      
+    }
   };
  
   useEffect(() => {
-    firestore()
-      .collection('Chats')
-      .doc(chatID)
-      .collection('Messages')      
-      .orderBy('createdAt', 'desc')
-      .onSnapshot(
-        querySnapshot => {
-          const content = [];
-          querySnapshot.forEach(doc => {
-            const entity = doc.data();
-            content.push(entity);
-          });
-          setMessageList(content);
-        },
-        error => {
-          console.log("There is an error", error);
-        }
-      )
+    const observer =  firestore()
+                        .collection('Chats')
+                        .doc(chatID)
+                        .collection('Messages')      
+                        .orderBy('createdAt', 'desc')
+                        .onSnapshot(
+                          querySnapshot => {
+                            const content = [];
+                            querySnapshot.forEach(doc => {
+                              const entity = doc.data();
+                              content.push(entity);
+                            });
+                            setMessageList(content);
+                          },
+                          error => {
+                            console.log("There is an error", error);
+                          }
+                        );
+    return () => observer;
+
   }, []);
 
   return (
@@ -106,7 +106,7 @@ export const ChatThread = () => {
         { messageList &&
             <FlatList 
               data={messageList}
-              keyExtractor={(item) => String(item.createdAt.toMillis())}
+              keyExtractor={(item) => String(item.createdAt)}
               renderItem={({item}) => {
                 return (
                   <>
@@ -127,7 +127,7 @@ export const ChatThread = () => {
               <Input
                 onChangeText={(nextValue) => onChange(nextValue)}
                 onBlur={onBlur}
-                passwordVal={value}
+                value={value}
                 style={styles.inputController}
               />
             )}
@@ -138,7 +138,7 @@ export const ChatThread = () => {
           <Button 
             styles={styles.buttonController}
             accessoryLeft={PostIcon}
-            onPress={handleSubmit(sendResponse)}
+            onPress={handleSubmit(onSubmit)}
           />
         </Layout>
       </Layout>

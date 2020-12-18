@@ -1,4 +1,5 @@
 SDSU RedID: 818759988
+<br>
 Project name: Renta
 
 Overview:
@@ -24,8 +25,8 @@ Instruction to run the project:
 + Open another terminal and run program: yarn android
 
 Know issues:
-Chat Message feature didn't work. Two users can't send text message between them. However, they can view who messaged them by clicking on "Message" icon on top right of the home screen.
-
-The app will take a little time to load since I used 3rd library for UI components.
++ I didn't handle unmount useEffect on some components. It might cause memory leak at sometimes.
++ Two users can send text message for each other but the feature is not fully tested.
++ The app will take a little time to load since I used 3rd library for UI components.
 
 
