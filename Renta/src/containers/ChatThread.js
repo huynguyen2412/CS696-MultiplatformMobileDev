@@ -50,7 +50,7 @@ export const ChatThread = () => {
 
   const navigateHome = () => navigation.goBack();
 
-  const onSubmit = async (data, e) => {
+  const onSubmit = async (data) => {
     if(data.messageInput !== ""){
       const timestamp = firestore.FieldValue.serverTimestamp();
       const myMessage = new MessagePOJO(timestamp, myuid, data.messageInput);   
@@ -58,7 +58,7 @@ export const ChatThread = () => {
         const chatRef = await firestore().collection('Chats').doc(chatID);
         const messagesRef = await chatRef.collection('Messages');
         const updateMessage = await messagesRef.add(myMessage);
-        reset();
+        reset({messageInput: ""});
       } catch (error) {
         console.log("Encounted error ", error)
       }      
@@ -70,7 +70,7 @@ export const ChatThread = () => {
                         .collection('Chats')
                         .doc(chatID)
                         .collection('Messages')      
-                        .orderBy('createdAt', 'desc')
+                        .orderBy('createdAt', 'asc')
                         .onSnapshot(
                           querySnapshot => {
                             const content = [];
