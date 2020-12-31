@@ -2,10 +2,10 @@ Overview:
 The project is an app to help people looking for a/an home/appartment for rent which called a "Renta". They can also post a house/appartment for rent. 
 The app is written using React Native framework and ReactNative Firebase(rnfirebase.io). The project used Firebase for authentication and storage.
 
-![register](https://github.com/huynguyen2412/CS696-MultiplatformMobileDev/blob/main/Renta/gifexample/register_account.gif)
-![login](https://github.com/huynguyen2412/CS696-MultiplatformMobileDev/blob/main/Renta/gifexample/login_account.gif)
-![postview](https://github.com/huynguyen2412/CS696-MultiplatformMobileDev/blob/main/Renta/gifexample/post_and_view.gif)
-![searchmessage](https://github.com/huynguyen2412/CS696-MultiplatformMobileDev/blob/main/Renta/gifexample/search_message_landlord.gif)
+![register](https://github.com/huynguyen2412/CS696-MultiplatformMobileDev/blob/main/Renta/gifexample/register_account.gif =250x250)
+![login](https://github.com/huynguyen2412/CS696-MultiplatformMobileDev/blob/main/Renta/gifexample/login_account.gif =250x250)
+![postview](https://github.com/huynguyen2412/CS696-MultiplatformMobileDev/blob/main/Renta/gifexample/post_and_view.gif =250x250)
+![searchmessage](https://github.com/huynguyen2412/CS696-MultiplatformMobileDev/blob/main/Renta/gifexample/search_message_landlord.gif =250x250)
 ![convo](https://github.com/huynguyen2412/CS696-MultiplatformMobileDev/blob/main/Renta/gifexample/convo.gif)
 
 Instruction to run the project:
